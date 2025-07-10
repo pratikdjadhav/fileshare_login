@@ -58,12 +58,11 @@ A simple and secure file-sharing web application with user login functionality, 
 ```
 fileshare_login/
 ├── app.py
-├── templates/
-│   ├── index.html
-│   ├── index2.html
-│   ├── login.html
-│   └── viewer.html
-└── static/           # Optional, for CSS/JS files
+└── templates/
+   ├── index.html
+   ├── login.html
+   └── viewer.html
+
 ```
 
 ---
