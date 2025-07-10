@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Media Viewer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root {
+      --bg-color: #121212;
+      --fg-color: #ffffff;
+      --accent: #00bcd4;
+      --card-bg: #1e1e1e;
+    }
+
+    body.light {
+      --bg-color: #ffffff;
+      --fg-color: #000000;
+      --accent: #0078d7;
+      --card-bg: #f0f0f0;
+    }
+    footer {
+  background-color: var(--card-bg);
+  color: var(--fg-color);
+  text-align: center;
+  padding: 16px;
+  font-size: 0.9rem;
+}
+
+
+    body {
+      margin: 0;
+      padding: 20px;
+      background-color: var(--bg-color);
+      color: var(--fg-color);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    h2 {
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    .container {
+      max-width: 1260px;
+      margin: auto;
+      text-align: center;
+    }
+
+    .media-box {
+      background-color: var(--card-bg);
+      border-radius: 12px;
+      margin-top: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    }
+
+    video, img {
+      max-width: 100%;
+      max-height: 80vh;
+      border-radius: 8px;
+    }
+
+    .controls {
+      margin-top: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      align-items: center;
+    }
+
+    button, input[type="number"], input[type="range"] {
+      padding: 8px 14px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      background-color: var(--accent);
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+
+    input[type="range"] {
+      width: 120px;
+      background-color: transparent;
+    }
+
+    button:hover {
+      background-color: #008ba3;
+    }
+
+    input[type="number"] {
+      width: 80px;
+      background-color: #333;
+      color: white;
+      text-align: center;
+    }
+
+    .back-btn {
+      background-color: #333;
+      color: white;
+      border: 1px solid #555;
+      margin-bottom: 15px;
+    }
+
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background-color: var(--accent);
+      color: white;
+      border-radius: 8px;
+      padding: 6px 12px;
+    }
+
+    .form-actions {
+      margin-top: 30px;
+    }
+
+    select {
+      padding: 8px;
+      border-radius: 5px;
+      background-color: #222;
+      color: white;
+      border: none;
+    }
+
+    .time-display {
+      font-size: 14px;
+      color: var(--fg-color);
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🔧 WebApp Developer: Pratik D. Jadhav</h2>
+    <button class="back-btn" onclick="goBack()">⬅ Back</button>
+    <button class="theme-toggle" onclick="toggleTheme()">🌓 Theme</button>
+    <h2>📁 Preview: {{ file_path }}</h2>
+
+    <div class="media-box">
+      {% if preview_type == 'video'  %}
+        <video id="mediaPlayer" controls>
+          <source src="{{ url_for('stream_media', file_path=file_path) }}">
+          Your browser does not support the video tag.
+        </video>
+          
+
+
+        <div class="controls">
+          <button onclick="togglePlay()">▶️/⏸</button>
+          <button onclick="skip(-10)">⏪ 10s</button>
+          <button onclick="skip(10)">⏩ 10s</button>
+          <input type="number" id="time" placeholder="Sec">
+          <button onclick="skipToCustomTime()">⏭ Skip</button>
+          <button onclick="setSpeed(1)">1x</button>
+          <button onclick="setSpeed(1.5)">1.5x</button>
+          <button onclick="setSpeed(2)">2x</button>
+          <button onclick="toggleMute()">🔇</button>
+          <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1">
+          <button onclick="toggleFullscreen()">⛶ Fullscreen</button>
+        </div>
+
+        <div class="time-display" id="timeDisplay">00:00 / 00:00</div>
+
+      {% elif preview_type == 'audio' %}
+        <audio id="audioPlayer" controls autoplay style="width: 100%;">
+          <source src="{{ url_for('stream_media', file_path=file_path) }}">
+          Your browser does not support the audio tag.
+        </audio>
+
+        <div class="controls">
+          <button onclick="togglePlay()">▶️/⏸</button>
+          <button onclick="skip(-10)">⏪ 10s</button>
+          <button onclick="skip(10)">⏩ 10s</button>
+          <input type="number" id="time" placeholder="Sec">
+          <button onclick="skipToCustomTime()">⏭ Skip</button>
+          <button onclick="setSpeed(1)">1x</button>
+          <button onclick="setSpeed(1.5)">1.5x</button>
+          <button onclick="setSpeed(2)">2x</button>
+          <button onclick="toggleMute()">🔇</button>
+          <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1">
+          <button onclick="toggleFullscreen()">⛶ Fullscreen</button>
+        </div>
+        
+        <div class="time-display" id="timeDisplay">00:00 / 00:00</div> 
+        <!-- <canvas id="visualizer" width="1260" height="100" style="margin-top: 20px;"></canvas> -->
+         <canvas id="visualizer" width="1260" height="150" style="margin-top: 20px;"></canvas>
+          
+
+
+
+
+
+
+
+
+      {% elif preview_type == 'image' %}
+        <img src="{{ url_for('stream_media', file_path=file_path) }}" alt="Image" />
+
+      {% else %}
+        <p>⚠️ Can't preview this file type.</p>
+        <a href="{{ url_for('download_file', file_path=file_path) }}">
+          <button>⬇ Download</button>
+        </a>
+
+        <div class="form-actions">
+          <form action="{{ url_for('change_extension', file_path=file_path) }}" method="post">
+            <label for="new_ext">Change Extension:</label>
+            <select name="new_ext" id="new_ext">
+              <option value=".mp4">.mp4</option>
+              <option value=".mp3">.mp3</option>
+              <option value=".jpg">.jpg</option>
+            </select>
+            <button type="submit">Rename</button>
+          </form>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+
+  <script>
+const video = document.getElementById('mediaPlayer');
+const audio = document.getElementById('audioPlayer');  // fixed ID
+const player = audio || video;
+
+  function togglePlay() {
+    if (player.paused) player.play(); else player.pause();
+  }
+
+  function skip(seconds) {
+    player.currentTime += seconds;
+  }
+
+  function skipToCustomTime() {
+    const value = parseFloat(document.getElementById('time').value);
+    if (!isNaN(value)) player.currentTime += value;
+  }
+
+  function setSpeed(rate) {
+    player.playbackRate = rate;
+  }
+
+  function toggleMute() {
+    player.muted = !player.muted;
+  }
+
+  function toggleFullscreen() {
+    if (player.requestFullscreen) player.requestFullscreen();
+    else if (player.webkitRequestFullscreen) player.webkitRequestFullscreen();
+    else if (player.msRequestFullscreen) player.msRequestFullscreen();
+  }
+
+  function toggleTheme() {
+    document.body.classList.toggle('light');
+  }
+
+  if (volumeSlider) {
+    volumeSlider.oninput = () => {
+      player.volume = volumeSlider.value;
+    };
+  }
+
+  if (player && timeDisplay) {
+    player.ontimeupdate = () => {
+      const format = sec => {
+        const m = Math.floor(sec / 60);
+        const s = Math.floor(sec % 60).toString().padStart(2, '0');
+        return `${m}:${s}`;
+      };
+      timeDisplay.textContent = `${format(player.currentTime)} / ${format(player.duration)}`;
+    };
+  }
+
+
+
+  function goBack() {
+    const pathParts = "{{ file_path|safe }}".split('/').filter(p => p);
+    pathParts.pop();
+    const folderPath = pathParts.join('/');
+    window.location.href = '/' + folderPath;
+  }
+
+const canvas = document.getElementById('visualizer');
+const ctx = canvas.getContext('2d');
+
+if (audio && ctx) {
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+  const audioCtx = new AudioContext();
+  const analyser = audioCtx.createAnalyser();
+  analyser.fftSize = 2048;
+
+  const source = audioCtx.createMediaElementSource(audio);
+  source.connect(analyser);
+  analyser.connect(audioCtx.destination);
+
+  const bufferLength = analyser.fftSize;
+  const dataArray = new Uint8Array(bufferLength);
+
+  function drawWaveform() {
+    requestAnimationFrame(drawWaveform);
+
+    analyser.getByteTimeDomainData(dataArray);
+
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.2)'; // Trail effect
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.lineWidth = 3;
+    const hue = Date.now() * 0.1 % 360;
+    ctx.strokeStyle = `hsl(${hue}, 100%, 60%)`;
+    ctx.shadowBlur = 20;
+    ctx.shadowColor = ctx.strokeStyle;
+
+    ctx.beginPath();
+
+    const sliceWidth = canvas.width / bufferLength;
+    let x = 0;
+
+    for (let i = 0; i < bufferLength; i++) {
+      const v = dataArray[i] / 128.0; // Normalize 0-1
+      const y = (v * canvas.height) / 2;
+
+      if (i === 0) {
+        ctx.moveTo(x, y);
+      } else {
+        ctx.lineTo(x, y);
+      }
+
+      x += sliceWidth;
+    }
+
+    ctx.lineTo(canvas.width, canvas.height / 2);
+    ctx.stroke();
+  }
+
+  audio.onplay = () => {
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume().then(drawWaveform);
+    } else {
+      drawWaveform();
+    }
+  };
+}
+</script>
+
+
+<footer style="
+  margin-top: 40px;
+  padding: 15px;
+  text-align: center;
+  background-color: var(--card-bg, #1e1e1e);
+  color: var(--fg-color, #ccc);
+  font-size: 14px;
+  border-top: 1px solid #444;
+">
+  Developed by <strong>Pratik D. Jadhav</strong> 💻 | Made Using by Flask 🚀
+  <br>
+  <span style="font-size: 12px; opacity: 0.7;">&copy; {{ 2025 }}</span>
+  <br>
+Contact: <a href="mailto:pratikdj.5699@gmail.com">pratikdj.5699@gmail.com || 8975720896</a>
+
+</footer>
+
+
+</body>
+</html>
